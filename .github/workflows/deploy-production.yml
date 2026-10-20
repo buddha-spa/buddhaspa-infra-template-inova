@@ -1,0 +1,37 @@
+name: Deploy Production
+
+on:
+  push:
+    branches:
+      - main
+
+concurrency:
+  group: production-deploy
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+
+      - name: Rewrite commit author for Vercel deploy authorization
+        run: |
+          git config user.name "adm-buddhaspa"
+          git config user.email "adm.engenharia@buddhaspa.com.br"
+          git commit --amend --no-edit --reset-author
+
+      - name: Deploy to Vercel Production
+        uses: amondnet/vercel-action@de09aeac2ace6599ec9b11ef87558759a496bac4
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          vercel-args: '--prod --yes'
+          working-directory: ./
