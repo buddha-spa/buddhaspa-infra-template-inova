@@ -37,4 +37,10 @@ O deploy na Vercel é feito pelo GitHub Actions:
 Configure estes Secrets no repositório: `VERCEL_TOKEN`, `VERCEL_ORG_ID` e `VERCEL_PROJECT_ID`.
 A integração Git nativa da Vercel fica desativada em `vercel.json` para evitar deploys duplicados.
 
+## Versionamento
+
+Cada push em `main` executa `auto-release.yml`, que usa `release-please` com Conventional Commits para abrir ou atualizar um PR de release com a próxima versão e o changelog.
+O tag e o GitHub Release são criados ao mergear esse PR.
+Configure os Secrets `RELEASE_PLEASE_APP_ID` e `RELEASE_PLEASE_APP_PRIVATE_KEY` com as credenciais de um GitHub App com permissão de `contents` e `pull-requests`.
+
 As proteções de branch e as demais regras de governança são definidas pela área de TI.
