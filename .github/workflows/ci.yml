@@ -4,6 +4,8 @@ on:
   pull_request:
     branches:
       - main
+    # "labeled" permite liberar o workflow num PR do Dependabot com a etiqueta ready-to-merge.
+    types: [opened, synchronize, reopened, labeled]
 
 concurrency:
   group: ci-${{ github.event.pull_request.number }}
@@ -16,6 +18,13 @@ jobs:
   lint-test:
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    # Não roda em PRs do release-please (só CHANGELOG/versão; o código já passou
+    # pelo gate ao entrar na branch principal). Em PRs do Dependabot, só com a
+    # etiqueta ready-to-merge. Job ignorado (skipped) conta como aprovado em checks obrigatórios.
+    if: >-
+      github.event.pull_request.user.login != 'buddhaspa-release-bot[bot]' &&
+      (github.event.pull_request.user.login != 'dependabot[bot]' ||
+       contains(github.event.pull_request.labels.*.name, 'ready-to-merge'))
     steps:
       - name: Checkout repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
